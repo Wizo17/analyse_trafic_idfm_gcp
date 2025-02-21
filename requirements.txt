@@ -1,0 +1,9 @@
+logging
+pandas
+numpy
+pyspark
+psycopg2
+SQLAlchemy
+pytest
+google-cloud-bigquery 
+google-cloud-storage
