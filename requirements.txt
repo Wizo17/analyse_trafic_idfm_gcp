@@ -3,7 +3,9 @@ pandas
 numpy
 pyspark
 psycopg2
+psycopg2-binary
 SQLAlchemy
 pytest
 google-cloud-bigquery 
 google-cloud-storage
+python-dotenv
