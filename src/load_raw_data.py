@@ -1,8 +1,6 @@
 import os
 from dotenv import load_dotenv
 import argparse
-import logging
-
 from utils import logger
 from queries.sql_raw_data import *
 from services.postgres import execute_query
@@ -45,7 +43,7 @@ def process_table(table_name, folder, file, part, queries, create_table):
     table_name (str): Table name
     folder (str): Subfolder of the data folder containing the data
     file (str): File to be integrated
-    part (str): Key and value for partitioning
+    part ((str, str)): Key and value for partitioning
     create_table (bool): Creating table or not
 
     Return:
@@ -78,13 +76,13 @@ def load_data(table_name, data_file_folder, file_data, load_part):
     Parameters:
     table_name (str): Table name
     data_file_folder (str): Subfolder of the data folder containing the data
-    file_data (str): File to be integrated
+    file_data ((str, str)): File to be integrated
     load_part (str): Key and value for partitioning
 
     Return:
     None
     '''
-    DB_DEFAULT_SCHEMA = os.getenv("DB_DEFAULT_SCHEMA")
+    DB_DEFAULT_SCHEMA = os.getenv("DB_POSTGRES_DEFAULT_SCHEMA")
 
     route_file_path = os.path.join(f"data/{data_file_folder}", file_data)
     return csv_to_table(route_file_path, table_name, DB_DEFAULT_SCHEMA, load_part)
