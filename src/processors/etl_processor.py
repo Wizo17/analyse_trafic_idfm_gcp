@@ -8,7 +8,7 @@ from pipelines.transform import (
     transform_calendar, transform_routes, transform_stop_times,
     transform_stops, transform_transfers, transform_trips
 )
-from pipelines.load import load_data_postgres
+from pipelines.load import load_data_bigquery, load_data_postgres
 
 class ETLProcessor:
     def __init__(self):
@@ -67,20 +67,28 @@ class ETLProcessor:
                 return False
 
             # Load
-            # TODO Bigquery - Implement for bigquery
             log_message("INFO", f"Load: {table_name}")
-            return load_data_postgres(
-                df, 
-                table_name,
-                global_conf.get("POSTGRES.DB_POSTGRES_DEFAULT_SCHEMA"),
-                (default_part_name, load_date)
-            )
-            
+            if global_conf.get("GENERAL.ENV") == "local":
+                return load_data_postgres(
+                    df, 
+                    table_name,
+                    global_conf.get("POSTGRES.DB_POSTGRES_DEFAULT_SCHEMA"),
+                    (default_part_name, load_date)
+                )
+            else:
+                return load_data_bigquery(
+                    df, 
+                    global_conf.get("GCP.GCP_PROJECT_ID"),
+                    global_conf.get("GCP.GCP_BIGQUERY_DATASET"),
+                    table_name,
+                    (default_part_name, load_date)
+                )
+                
         except Exception as e:
             log_message("ERROR", f"Error processing table {table_name}: {str(e)}")
             return False
 
-    def process_all_tables(self, load_date: str) -> None:
+    def process_all_tables(self, load_date: str) -> bool:
         """
         Process all tables in the ETL pipeline
         
@@ -88,12 +96,18 @@ class ETLProcessor:
             load_date: Loading date
         """
         try:
+            all_process_success = True
             for table_name, file_name in self.table_infos:
                 success = self.process_table(table_name, file_name, load_date)
                 if success:
                     log_message("INFO", f"Process table successful: {table_name}")
                 else:
+                    all_process_success = False
                     log_message("ERROR", f"Failed to process table: {table_name}")
+            
+            return all_process_success
+        except Exception as e:
+            return False
         finally:
             SparkSessionInstance.close_instance()
 
