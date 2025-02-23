@@ -1,11 +1,6 @@
-import os
-from dotenv import load_dotenv
+from common.config import global_conf
 
-load_dotenv()
-
-DB_DEFAULT_SCHEMA = os.getenv("DB_DEFAULT_SCHEMA")
-
-
+DB_DEFAULT_SCHEMA = global_conf.get("POSTGRES.DB_POSTGRES_DEFAULT_SCHEMA")
 
 STOP_TIMES_DELETE_SQL = f"DROP TABLE IF EXISTS {DB_DEFAULT_SCHEMA}.stop_times;"
 

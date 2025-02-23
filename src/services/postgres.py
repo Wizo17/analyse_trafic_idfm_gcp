@@ -2,18 +2,17 @@ import os
 import psycopg2
 import psycopg2 
 import pandas as pd 
-from spark_session import SparkSessionSingleton
-from utils import logger
+from common.spark_session import SparkSessionInstance
+from common.utils import logger
 from sqlalchemy import create_engine 
-from dotenv import load_dotenv
+from common.config import global_conf
 
-load_dotenv()
 
-DB_HOST = os.getenv("DB_POSTGRES_HOST")
-DB_PORT = os.getenv("DB_POSTGRES_PORT")
-DB_NAME = os.getenv("DB_POSTGRES_NAME")
-DB_USER = os.getenv("DB_POSTGRES_USER")
-DB_PASSWORD = os.getenv("DB_POSTGRES_PASSWORD")
+DB_HOST = global_conf.get("POSTGRES.DB_HOST")
+DB_PORT = global_conf.get("POSTGRES.DB_PORT")
+DB_NAME = global_conf.get("POSTGRES.DB_NAME")
+DB_USER = global_conf.get("POSTGRES.DB_USER")
+DB_PASSWORD = global_conf.get("POSTGRES.DB_PASSWORD")
 
 CONN_STRING = f"postgresql+psycopg2://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
 
@@ -110,8 +109,10 @@ def dataframe_to_table(dataframe, table_name, schema_name, partition):
         if execute_query(query):            
             logger("INFO", dataframe.printSchema())
 
+            dataframe.show(5)
+
             # Add data
-            dataframe.write.jdbc(url=SparkSessionSingleton.get_jdbc_url(), table=f"{schema_name}.{table_name}", mode="append", properties=SparkSessionSingleton.get_jdbc_properties())
+            dataframe.write.jdbc(url=SparkSessionInstance.get_jdbc_url(), table=f"{schema_name}.{table_name}", mode="append", properties=SparkSessionInstance.get_jdbc_properties())
             # logger("INFO", f"Adding data to the table {schema_name}.{table_name} successful")
             return True
         

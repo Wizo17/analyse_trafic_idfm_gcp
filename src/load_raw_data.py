@@ -1,12 +1,10 @@
 import os
-from dotenv import load_dotenv
 import argparse
-from utils import logger
+from common.utils import logger
 from queries.sql_raw_data import *
 from services.postgres import execute_query
 from services.postgres import csv_to_table
-
-load_dotenv()
+from common.config import global_conf
 
 def main():
     parser = argparse.ArgumentParser(description="Add raw data in postgres database")
@@ -82,7 +80,7 @@ def load_data(table_name, data_file_folder, file_data, load_part):
     Return:
     None
     '''
-    DB_DEFAULT_SCHEMA = os.getenv("DB_POSTGRES_DEFAULT_SCHEMA")
+    DB_DEFAULT_SCHEMA = global_conf.get("POSTGRES.DB_POSTGRES_DEFAULT_SCHEMA")
 
     route_file_path = os.path.join(f"data/{data_file_folder}", file_data)
     return csv_to_table(route_file_path, table_name, DB_DEFAULT_SCHEMA, load_part)

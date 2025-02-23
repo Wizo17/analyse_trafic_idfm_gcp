@@ -1,19 +1,12 @@
 import os
-from dotenv import load_dotenv
 from pyspark.sql.functions import *
 from pyspark.sql.types import *
+from common.spark_session import SparkSessionInstance
+from pipelines.extract import extract_data
+from common.utils import logger
+from common.config import global_conf
 
-from spark_session import SparkSessionSingleton
-from .extract import extract_data
-from utils import logger
-
-load_dotenv()
-
-ENV = os.getenv("ENV")
-DATA_FOLDER = os.getenv("DATA_FOLDER")
-GCP_BUCKET_NAME = os.getenv("GCP_BUCKET_NAME")
-
-spark = SparkSessionSingleton.get_instance()
+spark = SparkSessionInstance.get_instance()
 
 def transform_routes(dataframes, partition):
     # TODO Add documentation transform_route
@@ -29,10 +22,10 @@ def transform_routes(dataframes, partition):
                    .otherwise(""))
     
     file_name = "agency.txt"
-    if (ENV == "postgres"):
-        file_path = os.path.join(f"data/{DATA_FOLDER}", file_name)
+    if (global_conf.get("GENERAL.ENV") == "postgres"):
+        file_path = os.path.join(f"data/{global_conf.get("GENERAL.DATA_FOLDER")}", file_name)
     else:
-        file_path = GCP_BUCKET_NAME + "/" + file_name
+        file_path = global_conf.get("GCP.GCP_BUCKET_NAME") + "/" + file_name
 
     df_agency = extract_data(file_path, True)
     df_joined = df_routes.join(df_agency, on="agency_id", how="left")

@@ -3,14 +3,13 @@ import os
 from datetime import datetime
 import ctypes
 
-def logger(logging_level, message, output=3):
+def logger(logging_level, message):
     """
     Configures and returns a logger that displays and writes logs to the 'logs/' folder.
 
     Parameters:
     logging_level (str): Level of logging (DEBUG, INFO, ...)
     message (str): Message
-    output (int): Output where to write (1 = console, 2 = file, 3 = all)
     """
     # Create logs folder if it not exists
     if not os.path.exists('logs'):
@@ -26,6 +25,8 @@ def logger(logging_level, message, output=3):
         log_l = logging.ERROR
     elif logging_level == "CRITICAL":
         log_l = logging.CRITICAL
+    else:
+        log_l = logging.INFO
 
     # Intialization
     logger = logging.getLogger('analytics_logs')
