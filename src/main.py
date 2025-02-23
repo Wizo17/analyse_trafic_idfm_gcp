@@ -2,11 +2,13 @@ import os
 from dotenv import load_dotenv
 import argparse
 from pipelines.extract import extract_data
-from pipelines.transform import transform_route
+from pipelines.transform import transform_calendar, transform_routes, transform_stop_times, transform_stops, transform_transfers, transform_trips
 from pipelines.load import load_data_postgres
 from spark_session import SparkSessionSingleton
 from utils import is_admin, logger
 
+
+# TODO Optimize load ENV - use config.py
 load_dotenv()
 
 ENV = os.getenv("ENV")
@@ -26,7 +28,12 @@ def main():
 
     load_date = args.load_date
     table_infos_list = [
-        ('routes', 'routes.txt')
+        ('routes', 'routes.txt'),
+        ('trips', 'trips.txt'),
+        ('stops', 'stops.txt'),
+        ('stop_times', 'stop_times.txt'),
+        ('calendar', 'calendar.txt'),
+        ('transfers', 'transfers.txt')
     ]
 
     for table_info in table_infos_list:
@@ -50,7 +57,7 @@ def process_table(table_name, file_name, load_date):
     '''
     rs = False
 
-    #Extract, transform and load data
+    # Extract data
     if (ENV == "postgres"):
         file_path = os.path.join(f"data/{DATA_FOLDER}", file_name)
     else:
@@ -59,15 +66,22 @@ def process_table(table_name, file_name, load_date):
     logger("INFO", f"Extract: {table_name}")
     df = extract_data(file_path, True)
 
-    # logger("INFO", df.show(5))
-
+    # Transform data
     logger("INFO", f"Transform: {table_name}")
     if (table_name == 'routes'):
-        df = transform_route(df, (DB_POSTGRES_DEFAULT_PART_NAME, load_date))
+        df = transform_routes(df, (DB_POSTGRES_DEFAULT_PART_NAME, load_date))
+    elif (table_name == 'trips'):
+        df = transform_trips(df, (DB_POSTGRES_DEFAULT_PART_NAME, load_date))
+    elif (table_name == 'stops'):
+        df = transform_stops(df, (DB_POSTGRES_DEFAULT_PART_NAME, load_date))
+    elif (table_name == 'stop_times'):
+        df = transform_stop_times(df, (DB_POSTGRES_DEFAULT_PART_NAME, load_date))
+    elif (table_name == 'calendar'):
+        df = transform_calendar(df, (DB_POSTGRES_DEFAULT_PART_NAME, load_date))
+    elif (table_name == 'transfers'):
+        df = transform_transfers(df, (DB_POSTGRES_DEFAULT_PART_NAME, load_date))
     else:
         return False
-    
-    # logger("INFO", df.show(5))
     
     # TODO Load depend of ENV
     logger("INFO", f"Load: {table_name}")
