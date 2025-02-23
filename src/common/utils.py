@@ -3,65 +3,95 @@ import os
 from datetime import datetime
 import ctypes
 
-def logger(logging_level, message):
+# Global logger instance
+_logger = None
+
+def get_logger(logging_level="INFO"):
     """
-    Configures and returns a logger that displays and writes logs to the 'logs/' folder.
+    Configures and returns a singleton logger instance.
 
-    Parameters:
-    logging_level (str): Level of logging (DEBUG, INFO, ...)
-    message (str): Message
+    Args:
+        logging_level (str): Logging level (DEBUG, INFO, WARNING, ERROR, CRITICAL)
+
+    Returns:
+        logging.Logger: Configured logger instance
     """
-    # Create logs folder if it not exists
-    if not os.path.exists('logs'):
-        os.makedirs('logs')
+    global _logger
 
-    if logging_level == "DEBUG":
-        log_l = logging.DEBUG
-    elif logging_level == "INFO":
-        log_l = logging.INFO
-    elif logging_level == "WARNING":
-        log_l = logging.WARNING
-    elif logging_level == "ERROR":
-        log_l = logging.ERROR
-    elif logging_level == "CRITICAL":
-        log_l = logging.CRITICAL
-    else:
-        log_l = logging.INFO
+    if _logger is not None:
+        return _logger
 
-    # Intialization
-    logger = logging.getLogger('analytics_logs')
-    logger.setLevel(log_l)
-    formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
+    # Create logs directory if it does not exist
+    os.makedirs("logs", exist_ok=True)
 
-    if not logger.handlers:
-        # Handler for print log in terminal
+    # Mapping log level string to logging constants
+    log_levels = {
+        "DEBUG": logging.DEBUG,
+        "INFO": logging.INFO,
+        "WARNING": logging.WARNING,
+        "ERROR": logging.ERROR,
+        "CRITICAL": logging.CRITICAL
+    }
+    
+    log_level = log_levels.get(logging_level.upper(), logging.INFO)
+
+    # Logger initialization
+    logger = logging.getLogger("analytics_logs")
+    logger.setLevel(log_level)
+
+    # Ensure handlers are not added multiple times
+    if not logger.hasHandlers():
+        formatter = logging.Formatter("%(asctime)s - %(levelname)s - %(message)s")
+
+        # Console handler
         console_handler = logging.StreamHandler()
-        console_handler.setLevel(log_l) 
+        console_handler.setLevel(log_level)
         console_handler.setFormatter(formatter)
 
-        # Handler for print into file
-        log_filename = datetime.now().strftime('logs/app_%Y%m%d.log')
+        # File handler
+        log_filename = datetime.now().strftime("logs/app_%Y%m%d.log")
         file_handler = logging.FileHandler(log_filename)
-        file_handler.setLevel(log_l)
+        file_handler.setLevel(log_level)
         file_handler.setFormatter(formatter)
 
         logger.addHandler(console_handler)
         logger.addHandler(file_handler)
 
-    if log_l == logging.DEBUG:
-        logger.debug(message)
-    elif log_l == logging.INFO:
-        logger.info(message)
-    elif log_l == logging.WARNING:
-        logger.warning(message)
-    elif log_l == logging.ERROR:
-        logger.error(message)
-    elif log_l == logging.CRITICAL:
-        logger.critical(message)
+    _logger = logger
+    return logger
+
+
+def log_message(logging_level, message):
+    """
+    Logs a message using the configured logger.
+
+    Args:
+        logging_level (str): Logging level (DEBUG, INFO, WARNING, ERROR, CRITICAL)
+        message (str): The message to log
+    """
+    logger = get_logger(logging_level)
+
+    # Log the message based on the given level
+    log_methods = {
+        "DEBUG": logger.debug,
+        "INFO": logger.info,
+        "WARNING": logger.warning,
+        "ERROR": logger.error,
+        "CRITICAL": logger.critical
+    }
+
+    log_method = log_methods.get(logging_level.upper(), logger.info)
+    log_method(message)
 
 
 def is_admin():
+    """
+    Checks if the script is running with administrator privileges.
+
+    Returns:
+    bool: True if running as administrator, False otherwise
+    """
     try:
         return ctypes.windll.shell32.IsUserAnAdmin()
-    except:
+    except AttributeError:
         return False
