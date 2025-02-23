@@ -2,18 +2,17 @@ import os
 import psycopg2
 import psycopg2 
 import pandas as pd 
-from spark_session import SparkSessionSingleton
-from utils import logger
+from common.spark_session import SparkSessionInstance
+from common.utils import log_message
 from sqlalchemy import create_engine 
-from dotenv import load_dotenv
+from common.config import global_conf
 
-load_dotenv()
 
-DB_HOST = os.getenv("DB_POSTGRES_HOST")
-DB_PORT = os.getenv("DB_POSTGRES_PORT")
-DB_NAME = os.getenv("DB_POSTGRES_NAME")
-DB_USER = os.getenv("DB_POSTGRES_USER")
-DB_PASSWORD = os.getenv("DB_POSTGRES_PASSWORD")
+DB_HOST = global_conf.get("POSTGRES.DB_HOST")
+DB_PORT = global_conf.get("POSTGRES.DB_PORT")
+DB_NAME = global_conf.get("POSTGRES.DB_NAME")
+DB_USER = global_conf.get("POSTGRES.DB_USER")
+DB_PASSWORD = global_conf.get("POSTGRES.DB_PASSWORD")
 
 CONN_STRING = f"postgresql+psycopg2://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
 
@@ -33,10 +32,10 @@ def get_connection():
             user=DB_USER,
             password=DB_PASSWORD
         )
-        #logger("INFO", "Successful PostgreSQL connection!")
+        #log_message("INFO", "Successful PostgreSQL connection!")
         return conn
     except Exception as e:
-        logger("ERROR", f"Connection error : {e}")
+        log_message("ERROR", f"Connection error : {e}")
         return None
 
 
@@ -53,11 +52,11 @@ def execute_query(query, params=None):
             with conn.cursor() as cur:
                 cur.execute(query, params)
                 conn.commit()
-                # logger("INFO", "Request successfully executed!")
+                # log_message("INFO", "Request successfully executed!")
             
             return True
         except Exception as e:
-            logger("ERROR", f"Runtime error : {e}")
+            log_message("ERROR", f"Runtime error : {e}")
             return False
         finally:
             conn.close()
@@ -82,13 +81,13 @@ def csv_to_table(file_path, table_name, schema_name, partition):
             df = pd.read_csv(file_path)
             df[part_col] = part_val
             df.to_sql(table_name, engine, if_exists="append", index=False, schema=schema_name)
-            # logger("INFO", f"Adding data to the table {schema_name}.{table_name} successful")
+            # log_message("INFO", f"Adding data to the table {schema_name}.{table_name} successful")
             return True
         
-        logger("ERROR", f"Runtime error - Adding data to the table {schema_name}.{table_name} : {e}")
+        log_message("ERROR", f"Runtime error - Adding data to the table {schema_name}.{table_name} : {e}")
         return False
     except Exception as e:
-        logger("ERROR", f"Runtime error - Adding data to the table {schema_name}.{table_name} : {e}")
+        log_message("ERROR", f"Runtime error - Adding data to the table {schema_name}.{table_name} : {e}")
         return False
     finally:
         engine.dispose()
@@ -108,15 +107,15 @@ def dataframe_to_table(dataframe, table_name, schema_name, partition):
         query = f"DELETE FROM {schema_name}.{table_name} WHERE {part_col} = '{part_val}';"
 
         if execute_query(query):            
-            logger("INFO", dataframe.printSchema())
+            log_message("INFO", dataframe.printSchema())
 
             # Add data
-            dataframe.write.jdbc(url=SparkSessionSingleton.get_jdbc_url(), table=f"{schema_name}.{table_name}", mode="append", properties=SparkSessionSingleton.get_jdbc_properties())
-            # logger("INFO", f"Adding data to the table {schema_name}.{table_name} successful")
+            dataframe.write.jdbc(url=SparkSessionInstance.get_jdbc_url(), table=f"{schema_name}.{table_name}", mode="append", properties=SparkSessionInstance.get_jdbc_properties())
+            # log_message("INFO", f"Adding data to the table {schema_name}.{table_name} successful")
             return True
         
-        logger("ERROR", f"Runtime error - Adding data to the table {schema_name}.{table_name} : {e}")
+        log_message("ERROR", f"Runtime error - Adding data to the table {schema_name}.{table_name} : {e}")
         return False
     except Exception as e:
-        logger("ERROR", f"Runtime error - Adding data to the table {schema_name}.{table_name} : {e}")
+        log_message("ERROR", f"Runtime error - Adding data to the table {schema_name}.{table_name} : {e}")
         return False
