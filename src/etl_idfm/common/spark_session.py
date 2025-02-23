@@ -1,5 +1,5 @@
 from pyspark.sql import SparkSession
-from common.config import global_conf
+from etl_idfm.common.config import global_conf
 
 
 class SparkSessionInstance:

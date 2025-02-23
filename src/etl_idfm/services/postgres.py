@@ -2,10 +2,10 @@ import os
 import psycopg2
 import psycopg2 
 import pandas as pd 
-from common.spark_session import SparkSessionInstance
-from common.utils import log_message
+from etl_idfm.common.spark_session import SparkSessionInstance
+from etl_idfm.common.utils import log_message
 from sqlalchemy import create_engine 
-from common.config import global_conf
+from etl_idfm.common.config import global_conf
 
 
 DB_HOST = global_conf.get("POSTGRES.DB_HOST")

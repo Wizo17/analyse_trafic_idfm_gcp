@@ -6,5 +6,6 @@ setup(
     author="William ZOUNON",
     author_email="williamzounon@gmail.com",
     description="IDF public transport traffic analyses with python, pyspark and gcp or postgres.",
+    package_dir={'': 'src'},
 )
 

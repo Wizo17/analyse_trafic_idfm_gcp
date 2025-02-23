@@ -1,8 +1,8 @@
 import os
 from pyspark.sql.utils import AnalysisException
-from common.spark_session import SparkSessionInstance
-from common.utils import log_message
-from common.config import global_conf
+from etl_idfm.common.spark_session import SparkSessionInstance
+from etl_idfm.common.utils import log_message
+from etl_idfm.common.config import global_conf
 
 def extract_data(file_name, has_header):
     """

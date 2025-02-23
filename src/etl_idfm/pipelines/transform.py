@@ -1,9 +1,8 @@
-import os
 from pyspark.sql.functions import *
 from pyspark.sql.types import *
-from common.spark_session import SparkSessionInstance
-from pipelines.extract import extract_data
-from common.utils import log_message
+from etl_idfm.common.spark_session import SparkSessionInstance
+from etl_idfm.pipelines.extract import extract_data
+from etl_idfm.common.utils import log_message
 
 spark = SparkSessionInstance.get_instance()
 

@@ -7,11 +7,13 @@ if [ $? -eq 0 ]; then
     cd analyse_trafic_idfm_gcp
 
     cp .env_prod .env
+    cp .env src/.env
 
     if [ -f .env ]; then
         source .env
         date_var=$(date +%F)
 
+        rm etl_source_code.zip
         zip -r etl_source_code.zip src/ .env
 
         gsutil cp -r etl_source_code.zip gs://analytics_trafic_idfm/source_code/

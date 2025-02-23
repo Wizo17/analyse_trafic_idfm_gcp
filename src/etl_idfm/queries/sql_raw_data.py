@@ -1,4 +1,4 @@
-from common.config import global_conf
+from etl_idfm.common.config import global_conf
 
 DB_DEFAULT_SCHEMA = global_conf.get("POSTGRES.DB_POSTGRES_DEFAULT_SCHEMA")
 

@@ -1,10 +1,11 @@
 import os
 import argparse
-from common.utils import log_message
-from queries.sql_raw_data import *
-from services.postgres import execute_query
-from services.postgres import csv_to_table
-from common.config import global_conf
+from etl_idfm.common.utils import log_message
+from etl_idfm.queries.sql_raw_data import *
+from etl_idfm.services.postgres import execute_query
+from etl_idfm.services.postgres import csv_to_table
+from etl_idfm.common.config import global_conf
+
 
 def main():
     parser = argparse.ArgumentParser(description="Add raw data in postgres database")

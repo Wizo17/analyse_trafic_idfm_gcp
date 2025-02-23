@@ -1,7 +1,7 @@
 import argparse
 import sys
-from processors.etl_processor import ETLProcessor
-from common.utils import log_message
+from etl_idfm.processors.etl_processor import ETLProcessor
+from etl_idfm.common.utils import log_message
 
 def main():
     parser = argparse.ArgumentParser(description="ETL IDFM GTFS to Postgres/BigQuery DWH")

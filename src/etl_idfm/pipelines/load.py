@@ -1,7 +1,7 @@
 from google.cloud import bigquery
 from pyspark.sql.functions import col
-from services.bigquery import write_to_partitioned_bq
-from services.postgres import dataframe_to_table
+from etl_idfm.services.bigquery import write_to_partitioned_bq
+from etl_idfm.services.postgres import dataframe_to_table
 
 
 

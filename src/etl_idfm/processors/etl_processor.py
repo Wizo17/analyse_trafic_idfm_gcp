@@ -1,28 +1,28 @@
 import os
 from typing import List, Tuple
-from common.spark_session import SparkSessionInstance
-from common.config import global_conf
-from common.utils import log_message
-from pipelines.extract import extract_data
-from pipelines.transform import (
+from etl_idfm.common.spark_session import SparkSessionInstance
+from etl_idfm.common.config import global_conf
+from etl_idfm.common.utils import log_message
+from etl_idfm.pipelines.extract import extract_data
+from etl_idfm.pipelines.transform import (
     transform_calendar, transform_routes, transform_stop_times,
     transform_stops, transform_transfers, transform_trips
 )
-from pipelines.load import load_data_bigquery, load_data_postgres
+from etl_idfm.pipelines.load import load_data_bigquery, load_data_postgres
 
 class ETLProcessor:
     def __init__(self):
-        self.table_infos: List[Tuple[str, str]] = [
-            ('routes', 'routes.txt'),
-            ('trips', 'trips.txt'),
-            ('stops', 'stops.txt'),
-            ('stop_times', 'stop_times.txt'),
-            ('calendar', 'calendar.txt'),
-            ('transfers', 'transfers.txt')
-        ]
         # self.table_infos: List[Tuple[str, str]] = [
-        #     ('routes', 'routes.txt')
+        #     ('routes', 'routes.txt'),
+        #     ('trips', 'trips.txt'),
+        #     ('stops', 'stops.txt'),
+        #     ('stop_times', 'stop_times.txt'),
+        #     ('calendar', 'calendar.txt'),
+        #     ('transfers', 'transfers.txt')
         # ]
+        self.table_infos: List[Tuple[str, str]] = [
+            ('routes', 'routes.txt')
+        ]
         self.transform_functions = {
             'routes': transform_routes,
             'trips': transform_trips,
