@@ -12,10 +12,16 @@ if [ $? -eq 0 ]; then
         source .env
         date_var=$(date +%F)
 
+        zip -r etl_source_code.zip src/ .env
+
+        gsutil cp -r etl_source_code.zip gs://analytics_trafic_idfm/source_code/
+
         gcloud dataproc jobs submit pyspark \
         --cluster $GCP_CLUSTER_DATAPROC_NAME \
         --region $GCP_REGION_DEFAULT \
-        src/main.py "$date_var"
+        --py-files gs://analytics_trafic_idfm/source_code/etl_source_code.zip \
+        --files gs://analytics_trafic_idfm/source_code/etl_source_code.zip \
+        src/main.py -- "$date_var"
 
         if [ $? -eq 0 ]; then
             # gsutil rm "$GCP_BUCKET_NAME/*"
