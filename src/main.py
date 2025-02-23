@@ -1,4 +1,5 @@
 import argparse
+import sys
 from processors.etl_processor import ETLProcessor
 from common.utils import log_message
 
@@ -11,9 +12,12 @@ def main():
     log_message("INFO", f"main.py {args.load_date}")
 
     processor = ETLProcessor()
-    processor.process_all_tables(args.load_date)
+    rs = processor.process_all_tables(args.load_date)
 
     log_message("INFO", "*************************** END ETL IDFM GTFS to Postgres/BigQuery DWH ***************************")
 
+    return rs
+
 if __name__ == "__main__":
-    main()
+    exit_code = main()
+    sys.exit(int(not exit_code))

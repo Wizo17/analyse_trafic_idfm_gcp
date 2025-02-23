@@ -14,15 +14,20 @@ class SparkSessionInstance:
     @staticmethod
     def get_instance():
         if SparkSessionInstance._instance is None:
-            SparkSessionInstance._instance = SparkSession.builder \
-                                                .appName(f"GLOBAL: {global_conf.get("GENERAL.APP_NAME")}") \
-                                                .config("spark.driver.host", global_conf.get("GENERAL.SPARK_HOST")) \
-                                                .config("spark.driver.extraClassPath", global_conf.get("GENERAL.SPARK_JDBC_PATH")) \
-                                                .config("spark.executor.extraClassPath", global_conf.get("GENERAL.SPARK_JDBC_PATH")) \
-                                                .config("spark.files.cleanupTime", "0") \
-                                                .config("spark.shuffle.service.enabled", "false") \
-                                                .master("local[*]") \
-                                                .getOrCreate()
+            if global_conf.get("GENERAL.ENV") == "local":
+                SparkSessionInstance._instance = SparkSession.builder \
+                                                    .appName(f"GLOBAL: {global_conf.get("GENERAL.APP_NAME")}") \
+                                                    .config("spark.driver.host", global_conf.get("GENERAL.SPARK_HOST")) \
+                                                    .config("spark.driver.extraClassPath", global_conf.get("GENERAL.SPARK_JDBC_PATH")) \
+                                                    .config("spark.executor.extraClassPath", global_conf.get("GENERAL.SPARK_JDBC_PATH")) \
+                                                    .config("spark.files.cleanupTime", "0") \
+                                                    .config("spark.shuffle.service.enabled", "false") \
+                                                    .master("local[*]") \
+                                                    .getOrCreate()
+            else:
+                SparkSessionInstance._instance = SparkSession.builder \
+                                                    .appName(f"GLOBAL: {global_conf.get("GENERAL.APP_NAME")}") \
+                                                    .getOrCreate()
         return SparkSessionInstance._instance
     
     @staticmethod

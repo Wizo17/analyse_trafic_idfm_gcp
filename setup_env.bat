@@ -8,5 +8,8 @@ call venv\Scripts\activate
 echo Installing dependencies...
 pip install -r requirements.txt
 
+echo Copying .env...
+cp .env_prod .env
+
 echo Environment successfully configured!
 pause

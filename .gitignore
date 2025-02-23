@@ -15,3 +15,5 @@ __pycache__/
 
 data/IDFM-gtfs
 
+requirements_base.txt
+
