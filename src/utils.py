@@ -1,6 +1,7 @@
 import logging
 import os
 from datetime import datetime
+import ctypes
 
 def logger(logging_level, message, output=3):
     """
@@ -57,3 +58,9 @@ def logger(logging_level, message, output=3):
     elif log_l == logging.CRITICAL:
         logger.critical(message)
 
+
+def is_admin():
+    try:
+        return ctypes.windll.shell32.IsUserAnAdmin()
+    except:
+        return False

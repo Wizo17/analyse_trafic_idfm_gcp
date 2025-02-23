@@ -107,7 +107,9 @@ def dataframe_to_table(dataframe, table_name, schema_name, partition):
 
         query = f"DELETE FROM {schema_name}.{table_name} WHERE {part_col} = '{part_val}';"
 
-        if execute_query(query):
+        if execute_query(query):            
+            logger("INFO", dataframe.printSchema())
+
             # Add data
             dataframe.write.jdbc(url=SparkSessionSingleton.get_jdbc_url(), table=f"{schema_name}.{table_name}", mode="append", properties=SparkSessionSingleton.get_jdbc_properties())
             # logger("INFO", f"Adding data to the table {schema_name}.{table_name} successful")

@@ -11,12 +11,12 @@ DB_PORT = os.getenv("DB_POSTGRES_PORT")
 DB_NAME = os.getenv("DB_POSTGRES_NAME")
 DB_USER = os.getenv("DB_POSTGRES_USER")
 DB_PASSWORD = os.getenv("DB_POSTGRES_PASSWORD")
-PATH_POSTGRES_CONNECTOR_JAR = os.getenv("PATH_POSTGRES_CONNECTOR_JAR")
+SPARK_JDBC_PATH = os.getenv("SPARK_JDBC_PATH")
+SPARK_HOST = os.getenv("SPARK_HOST")
 
 
 class SparkSessionSingleton:
     _instance = None
-    _instance_postgres = None
     _jdbc_url = f"jdbc:postgresql://{DB_HOST}:{DB_PORT}/{DB_NAME}"
     _jdbc_properties = {
         "user": f"{DB_USER}",
@@ -28,31 +28,21 @@ class SparkSessionSingleton:
     def get_instance():
         if SparkSessionSingleton._instance is None:
             SparkSessionSingleton._instance = SparkSession.builder \
-                .appName(f"GLOBAL: {APP_NAME}") \
-                .getOrCreate()
+                                                .appName(f"GLOBAL: {APP_NAME}") \
+                                                .config("spark.driver.host", SPARK_HOST) \
+                                                .config("spark.driver.extraClassPath", r"C:\apps\drivers\postgresql-42.7.5.jar") \
+                                                .config("spark.executor.extraClassPath", r"C:\apps\drivers\postgresql-42.7.5.jar") \
+                                                .config("spark.files.cleanupTime", "0") \
+                                                .config("spark.shuffle.service.enabled", "false") \
+                                                .master("local[*]") \
+                                                .getOrCreate()
         return SparkSessionSingleton._instance
     
     @staticmethod
     def close_instance():
         if SparkSessionSingleton._instance is not None:
             SparkSessionSingleton._instance.stop()
-            SparkSessionSingleton._instance = None
-
-    @staticmethod
-    def get_instance_postgres():
-        if SparkSessionSingleton._instance_postgres is None:
-            SparkSessionSingleton._instance_postgres = SparkSession.builder \
-                .appName(f"POSTGRES: {APP_NAME}") \
-                .config("spark.driver.host", DB_HOST) \
-                .config("spark.jars", PATH_POSTGRES_CONNECTOR_JAR) \
-                .getOrCreate()
-        return SparkSessionSingleton._instance_postgres
-            
-    @staticmethod
-    def close_instance():
-        if SparkSessionSingleton._instance_postgres is not None:
-            SparkSessionSingleton._instance_postgres.stop()
-            SparkSessionSingleton._instance_postgres = None        
+            SparkSessionSingleton._instance = None     
 
     @staticmethod
     def get_jdbc_url():

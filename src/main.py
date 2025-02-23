@@ -5,7 +5,7 @@ from pipelines.extract import extract_data
 from pipelines.transform import transform_route
 from pipelines.load import load_data_postgres
 from spark_session import SparkSessionSingleton
-from utils import logger
+from utils import is_admin, logger
 
 load_dotenv()
 
@@ -58,6 +58,8 @@ def process_table(table_name, file_name, load_date):
 
     logger("INFO", f"Extract: {table_name}")
     df = extract_data(file_path, True)
+
+    # logger("INFO", df.show(5))
 
     logger("INFO", f"Transform: {table_name}")
     if (table_name == 'routes'):
