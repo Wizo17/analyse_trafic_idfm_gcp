@@ -1,6 +1,6 @@
 #!/bin/bash
 
-echo "Retrieving the git repository..."
+echo "Retrieving the git repository."
 cd ~
 git clone https://github.com/Wizo17/analyse_trafic_idfm_gcp.git
 
@@ -16,7 +16,7 @@ if [ $? -eq 0 ]; then
         source .env
         date_var=$(date +%F)
 
-        rm etl_source_code.zip
+        rm -f etl_source_code.zip
         cd src
         zip -r ../etl_source_code.zip *
         cd ..
@@ -48,7 +48,7 @@ if [ $? -eq 0 ]; then
     fi
 
 else
-    echo "An error occurred while cloning the repository..."
+    echo "An error occurred while cloning the repository."
     exit 1
 fi
 
