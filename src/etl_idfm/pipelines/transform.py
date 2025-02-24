@@ -3,6 +3,7 @@ from pyspark.sql.types import *
 from etl_idfm.common.spark_session import SparkSessionInstance
 from etl_idfm.pipelines.extract import extract_data
 from etl_idfm.common.utils import log_message
+from etl_idfm.common.config import global_conf
 
 spark = SparkSessionInstance.get_instance()
 
@@ -44,7 +45,7 @@ def transform_routes(dataframe, partition):
         log_message("INFO", f"Successful routes dataframe transformation")
         return df_final
     except Exception as e:
-        log_message("ERROR", f"An error occurred during routes dataframe trnasformation")
+        log_message("ERROR", f"An error occurred during routes dataframe trnasformation: {str(e)}")
         return None
 
 
@@ -83,7 +84,7 @@ def transform_trips(dataframe, partition):
         log_message("INFO", f"Successful trips dataframe transformation")
         return df_final
     except Exception as e:
-        log_message("ERROR", f"An error occurred during trips dataframe trnasformation")
+        log_message("ERROR", f"An error occurred during trips dataframe trnasformation: {str(e)}")
         return None
 
 
@@ -104,22 +105,28 @@ def transform_stops(dataframe, partition):
         df.createOrReplaceTempView("temp_stops")
 
         query = f"""
-            SELECT 
-                stop_id,
-                stop_name,
-                CAST(stop_lat AS DECIMAL(9,6)) AS stop_lat,
-                CAST(stop_lon AS DECIMAL(9,6)) AS stop_lon,
-                zone_id,
-                CAST('{partition[1]}' AS DATE) AS {partition[0]}
-            FROM temp_stops 
-            WHERE stop_id IS NOT NULL AND stop_id != ''
+                SELECT 
+                    stop_id,
+                    stop_name,
+                    CAST(stop_lat AS DECIMAL(9,6)) AS stop_lat,
+                    CAST(stop_lon AS DECIMAL(9,6)) AS stop_lon,
+                    zone_id,
+                    CAST('{partition[1]}' AS DATE) AS {partition[0]}
+                FROM temp_stops 
+                WHERE stop_id IS NOT NULL AND stop_id != ''
             """
+
         df_final = spark.sql(query)
+
+        if global_conf.get("GENERAL.ENV") == "gcp":
+            log_message("INFO", f"I AM HERE")
+            df_final = df_final.withColumn("stop_lat", col("stop_lat").cast(DoubleType())) \
+                                .withColumn("stop_lon", col("stop_lon").cast(DoubleType()))
 
         log_message("INFO", f"Successful stops dataframe transformation")
         return df_final
     except Exception as e:
-        log_message("ERROR", f"An error occurred during stops dataframe trnasformation")
+        log_message("ERROR", f"An error occurred during stops dataframe trnasformation: {str(e)}")
         return None
     
 
@@ -154,7 +161,7 @@ def transform_stop_times(dataframe, partition):
         log_message("INFO", f"Successful stop_times dataframe transformation")
         return df_final
     except Exception as e:
-        log_message("ERROR", f"An error occurred during stop_times dataframe trnasformation")
+        log_message("ERROR", f"An error occurred during stop_times dataframe trnasformation: {str(e)}")
         return None
     
 
@@ -194,7 +201,7 @@ def transform_calendar(dataframe, partition):
         log_message("INFO", f"Successful calendar dataframe transformation")
         return df_final
     except Exception as e:
-        log_message("ERROR", f"An error occurred during calendar dataframe trnasformation")
+        log_message("ERROR", f"An error occurred during calendar dataframe trnasformation: {str(e)}")
         return None
 
 
@@ -228,7 +235,7 @@ def transform_transfers(dataframe, partition):
         log_message("INFO", f"Successful trips dataframe transformation")
         return df_final
     except Exception as e:
-        log_message("ERROR", f"An error occurred during trips dataframe trnasformation")
+        log_message("ERROR", f"An error occurred during trips dataframe trnasformation: {str(e)}")
         return None
 
 

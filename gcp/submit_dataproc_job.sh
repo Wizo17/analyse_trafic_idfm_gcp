@@ -1,7 +1,10 @@
 #!/bin/bash
 
 echo "Retrieving the git repository..."
+cd ~
 git clone https://github.com/Wizo17/analyse_trafic_idfm_gcp.git
+
+# TODO Create and delete cluster
 
 if [ $? -eq 0 ]; then
     cd analyse_trafic_idfm_gcp
@@ -14,15 +17,22 @@ if [ $? -eq 0 ]; then
         date_var=$(date +%F)
 
         rm etl_source_code.zip
-        zip -r etl_source_code.zip src/ .env
+        cd src
+        zip -r ../etl_source_code.zip *
+        cd ..
+        zip -g etl_source_code.zip .env
+        zip -g etl_source_code.zip setup.py
 
         gsutil cp -r etl_source_code.zip gs://analytics_trafic_idfm/source_code/
+        gsutil cp -r requirements.txt gs://analytics_trafic_idfm/source_code/
+        gsutil cp -r .env gs://analytics_trafic_idfm/source_code/
+        gsutil cp -r init_create_dataproc_cluster.sh gs://analytics_trafic_idfm/source_code/
 
         gcloud dataproc jobs submit pyspark \
         --cluster $GCP_CLUSTER_DATAPROC_NAME \
         --region $GCP_REGION_DEFAULT \
         --py-files gs://analytics_trafic_idfm/source_code/etl_source_code.zip \
-        --files gs://analytics_trafic_idfm/source_code/etl_source_code.zip \
+        --files gs://analytics_trafic_idfm/source_code/.env \
         src/main.py -- "$date_var"
 
         if [ $? -eq 0 ]; then

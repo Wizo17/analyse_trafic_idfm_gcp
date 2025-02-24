@@ -1,7 +1,8 @@
 from google.cloud import bigquery
+from etl_idfm.common.utils import log_message
 
 
-def write_to_partitioned_bq(dataframe, gcp_project_id, bigquery_dataset, table_name, partition, write_mode="overwrite", temp_bucket=None):
+def write_to_partitioned_bq(dataframe, gcp_project_id, bigquery_dataset, table_name, partition, write_mode="overwrite"):
     """
     Write a PySpark DataFrame to a partitioned BigQuery table.
     If data exists for the specified partition, it will be deleted before writing.
@@ -13,7 +14,6 @@ def write_to_partitioned_bq(dataframe, gcp_project_id, bigquery_dataset, table_n
         table_name (str): BigQuery table ID
         partition (str): Name and Value of the partition
         write_mode (str): Write mode ('overwrite' or 'append')
-        temp_bucket (str, optional): GCS bucket for temporary storage
         
     Returns:
         bool: True if write successful, False otherwise
@@ -25,6 +25,8 @@ def write_to_partitioned_bq(dataframe, gcp_project_id, bigquery_dataset, table_n
     try:
         # Initialize BigQuery client
         bq_client = bigquery.Client(project=gcp_project_id)
+
+        log_message("INFO", dataframe.printSchema())
         
         # Check if table exists
         try:
@@ -45,16 +47,17 @@ def write_to_partitioned_bq(dataframe, gcp_project_id, bigquery_dataset, table_n
         # Configure write options
         write_options = {
             "table": table_path,
-            "temporaryGcsBucket": temp_bucket,
             "partitionField": partition[0],
             "partitionType": "DAY",
             "createDisposition": "CREATE_IF_NEEDED",
-            "writeDisposition": "WRITE_APPEND"
+            "writeDisposition": "WRITE_APPEND",
+            "writeMethod": "direct"
         }
         
         # Write to BigQuery
         dataframe.write.format("bigquery") \
             .options(**write_options) \
+            .mode("append") \
             .save()
             
         return True

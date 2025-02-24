@@ -12,17 +12,17 @@ from etl_idfm.pipelines.load import load_data_bigquery, load_data_postgres
 
 class ETLProcessor:
     def __init__(self):
-        # self.table_infos: List[Tuple[str, str]] = [
-        #     ('routes', 'routes.txt'),
-        #     ('trips', 'trips.txt'),
-        #     ('stops', 'stops.txt'),
-        #     ('stop_times', 'stop_times.txt'),
-        #     ('calendar', 'calendar.txt'),
-        #     ('transfers', 'transfers.txt')
-        # ]
         self.table_infos: List[Tuple[str, str]] = [
-            ('routes', 'routes.txt')
+            ('routes', 'routes.txt'),
+            ('trips', 'trips.txt'),
+            ('stops', 'stops.txt'),
+            ('stop_times', 'stop_times.txt'),
+            ('calendar', 'calendar.txt'),
+            ('transfers', 'transfers.txt')
         ]
+        # self.table_infos: List[Tuple[str, str]] = [
+        #     ('routes', 'routes.txt')
+        # ]
         self.transform_functions = {
             'routes': transform_routes,
             'trips': transform_trips,

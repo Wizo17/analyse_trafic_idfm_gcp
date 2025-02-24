@@ -18,8 +18,8 @@ PARTITION BY ingest_date;
 
 
 -- trips
-DROP TABLE IF EXISTS `analytics-trafic-idfm.analytics_dwh.routes`;
-CREATE OR REPLACE TABLE `analytics-trafic-idfm.analytics_dwh.routes`
+DROP TABLE IF EXISTS `analytics-trafic-idfm.analytics_dwh.trips`;
+CREATE OR REPLACE TABLE `analytics-trafic-idfm.analytics_dwh.trips`
 (
     route_id STRING,
     agency_name STRING,

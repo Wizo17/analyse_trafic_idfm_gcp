@@ -2,6 +2,7 @@ import logging
 import os
 from datetime import datetime
 import ctypes
+from etl_idfm.common.config import global_conf
 
 # Global logger instance
 _logger = None
@@ -49,7 +50,11 @@ def get_logger(logging_level="INFO"):
         console_handler.setFormatter(formatter)
 
         # File handler
-        log_filename = datetime.now().strftime("logs/app_%Y%m%d.log")
+        if global_conf.get("GENERAL.ENV") == "local":
+            log_filename = datetime.now().strftime("logs/app_%Y%m%d.log")
+        else:
+            # TODO Send log to cloud logging on gcp
+            log_filename = datetime.now().strftime("app_%Y%m%d.log")
         file_handler = logging.FileHandler(log_filename)
         file_handler.setLevel(log_level)
         file_handler.setFormatter(formatter)
