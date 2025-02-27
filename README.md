@@ -10,8 +10,9 @@ The project uses:
 * [PySpark, SparkSQL](https://spark.apache.org/docs/latest/api/python/index.html)
 * [Google Cloud Platform (Dataproc, BigQuery, Cloud Run, Cloud Storage, Artifactory Registry)](https://cloud.google.com/?hl=fr)
 * [Shell script](https://www.shellscript.sh/)
-* [Postges](https://www.postgresql.org/)
+* [Postgres](https://www.postgresql.org/)
 * [Docker](https://www.docker.com/)
+* [Looker Studio](https://lookerstudio.google.com/)
 
 Ressources uses:
 * [IDFM GTFS - DATA IDFM](https://data.iledefrance-mobilites.fr/explore/dataset/offre-horaires-tc-gtfs-idfm/information/)
@@ -27,6 +28,8 @@ Ressources uses:
 * Sending a <u>PySpark job</u> to the Dataproc cluster.
 * Feed <u>BigQuery</u> tables after the ETL process.
 * If all goes well, Dataproc cluster and files are deleted.
+* Views are built from data in BigQuery.
+* Dashboard creation with <u>Looker Studio</u>.
 
 
 ## Install
@@ -61,6 +64,9 @@ There are 2 choices for running the programs. Either with postgres locally or on
 3. Use the console to create elements.
 4. Follow script instructions [init_gcp_environment.sh](gcp/init_gcp_environment.sh) to create only your own elements.
 5. **!!!Attention!!!**, you don't need to run the whole script and you need to update the commands with your own information.
+6. You can do all the data analysis you want with the data.
+7. Sample queries can be found in the gcp/bigquery folder.
+8. A sample report can be found [here]() 
 
 ## Versions
 **LTS :** [1.0]((https://github.com/Wizo17/analyse_trafic_idfm_gcp.git))
