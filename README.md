@@ -66,7 +66,7 @@ There are 2 choices for running the programs. Either with postgres locally or on
 5. **!!!Attention!!!**, you don't need to run the whole script and you need to update the commands with your own information.
 6. You can do all the data analysis you want with the data.
 7. Sample queries can be found in the gcp/bigquery folder.
-8. A sample report can be found [here]() 
+8. A sample report can be found [here](gcp/report/Analysis_trafic_IDFM.pdf) 
 
 ## Versions
 **LTS :** [1.0]((https://github.com/Wizo17/analyse_trafic_idfm_gcp.git))
